@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="text-center my-5">To Do List</h1>
+
+<form class="w-50 mx-auto mb-5 d-flex" id="todo-form" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input class="btn btn-primary mx-1 border" type="submit" value="Add">
+</form>
+
+
+<section class="card p-4">
+
+    <ul id="tabs" class="nav nav-pills mb-4 pb-2">
+        <li class="nav-item">
+            <a class="nav-link {% if filter_choice == 'ALL' %}active{% endif %}" href="{% url 'index' %}">
+                All
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_choice == Status.TODO %}active{% endif %}"
+                href="{% url 'filter' Status.TODO %}">To Do</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_choice == Status.DOING %}active{% endif %}"
+                href="{% url 'filter' Status.DOING %}">Doing</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_choice == Status.DONE %}active{% endif %}"
+                href="{% url 'filter' Status.DONE %}">Done</a>
+        </li>
+    </ul>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Task</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody id="todo-rows">
+            {% for task in tasks %}
+
+            <tr id="task-row-{{task.id}}">
+
+                {% if task.status == Status.DONE %}
+                <td>
+                    <del>{{task.name}}</del>
+                </td>
+                {% else %}
+                <td>{{task.name}}</td>
+                {% endif %}
+
+                <td>
+                    {% if task.status == Status.TODO %}
+                    <div class="btn btn-danger border">To Do</div>
+                    {% else %}
+                    <a class="btn btn-light border" href="{% url 'update_status' task.id Status.TODO %}">To Do</a>
+                    {% endif %}
+
+                    {% if task.status == Status.DOING %}
+                    <div class="btn btn-primary border">Doing</div>
+                    {% else %}
+                    <a class="btn btn-light border" href="{% url 'update_status' task.id Status.DOING %}">Doing</a>
+                    {% endif %}
+
+                    {% if task.status == Status.DONE %}
+                    <div class="btn btn-success border">Done</div>
+                    {% else %}
+                    <a class="btn btn-light border" href="{% url 'update_status' task.id Status.DONE %}">Done</a>
+                    {% endif %}
+
+                </td>
+                <td>
+                    <a class="m-2" href="{% url 'delete' task.id %}">
+                        <i class="link-dark bi-x-lg"></i>
+                    </a>
+                </td>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+</section>
+
+{% endblock %}
